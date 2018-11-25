@@ -1,0 +1,6 @@
+enabled: true
+subscribe:
+  handlers:
+    local: \Grav\Plugin\Newsletter\SubscribeHandler\Local
+  fileProcessors:
+    csv: \Grav\Plugin\Newsletter\FileProcessor\Csv

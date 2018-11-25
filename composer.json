@@ -1,0 +1,26 @@
+{
+    "name": "michalbiarda/grav-plugin-newsletter",
+    "description": "Allows user to subscribe to a newsletter",
+    "type": "grav-plugin",
+    "require": {
+        "league/csv": "^9.1",
+        "pimple/pimple": "~3.0"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^7.4"
+    },
+    "license": "THE BEER-WARE LICENSE",
+    "authors": [
+        {
+            "name": "Michał Biarda",
+            "email": "m.biarda@gmail.com"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "Grav\\Plugin\\Newsletter\\": "classes/",
+            "Grav\\Plugin\\Newsletter\\Test\\Unit\\": "tests/unit/",
+            "Grav\\Plugin\\Newsletter\\Test\\Integration\\": "tests/integration//"
+        }
+    }
+}
