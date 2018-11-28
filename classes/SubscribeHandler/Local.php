@@ -30,7 +30,7 @@ class Local extends SubscribeHandlerAbstract
         $locator = Grav::instance()['locator'];
         $fileProcessor->upsert(
             $locator->findResource('user://data', true) . DIRECTORY_SEPARATOR . $filepath,
-            $values,
+            array_merge($values, ['hash' => $this->container->getHasher()->hash($values[$identifier])]),
             $identifier
         );
     }

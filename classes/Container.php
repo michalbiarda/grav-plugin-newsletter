@@ -28,61 +28,48 @@ class Container extends \Pimple\Container
         $this['fileProcessorFactory'] = function() {
             return new FileProcessorFactory($this);
         };
+        $this['hasher'] = function() {
+            return new Hasher($this);
+        };
     }
 
-    /**
-     * @return ObjectCreator
-     */
-    public function getObjectCreator()
+    public function getObjectCreator(): ObjectCreator
     {
         return $this['objectCreator'];
     }
 
-    /**
-     * @return FormProcessor
-     */
-    public function getFormProcessor()
+    public function getFormProcessor(): FormProcessor
     {
         return $this['formProcessor'];
     }
 
-    /**
-     * @return SubscribeHandlerFactory
-     */
-    public function getSubscribeHandlerFactory()
+    public function getSubscribeHandlerFactory(): SubscribeHandlerFactory
     {
         return $this['subscribeHandlerFactory'];
     }
 
-    /**
-     * @return Config
-     */
-    public function getConfig()
+    public function getConfig(): Config
     {
         return $this['config'];
     }
 
-    /**
-     * @return ParamsProcessor
-     */
-    public function getParamsProcessor()
+    public function getParamsProcessor(): ParamsProcessor
     {
         return $this['paramsProcessor'];
     }
 
-    /**
-     * @return ValuesHydrator
-     */
-    public function getValuesHydrator()
+    public function getValuesHydrator(): ValuesHydrator
     {
         return $this['valuesHydrator'];
     }
 
-    /**
-     * @return FileProcessorFactory
-     */
-    public function getFileProcessorFactory()
+    public function getFileProcessorFactory(): FileProcessorFactory
     {
         return $this['fileProcessorFactory'];
+    }
+
+    public function getHasher(): Hasher
+    {
+        return $this['hasher'];
     }
 }
