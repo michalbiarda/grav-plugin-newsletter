@@ -4,3 +4,6 @@ subscribe:
     local: \Grav\Plugin\Newsletter\SubscribeHandler\Local
   fileProcessors:
     csv: \Grav\Plugin\Newsletter\FileProcessor\Csv
+unsubscribe:
+  successPath: /newsletter/unsubscribe/success
+  errorPath: /newsletter/unsubscribe/error
