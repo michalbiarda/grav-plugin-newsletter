@@ -4,5 +4,5 @@ namespace Grav\Plugin\Newsletter;
 
 interface SubscribeHandlerInterface
 {
-    public function run(): void;
+    public function subscribe(): void;
 }

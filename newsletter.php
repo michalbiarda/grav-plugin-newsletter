@@ -3,6 +3,7 @@ namespace Grav\Plugin;
 
 use Grav\Common\Plugin;
 use Grav\Plugin\Newsletter\Container;
+use Grav\Plugin\Newsletter\Controller\NewsletterController;
 use RocketTheme\Toolbox\Event\Event;
 
 /**
@@ -11,6 +12,8 @@ use RocketTheme\Toolbox\Event\Event;
  */
 class NewsletterPlugin extends Plugin
 {
+    const UNSUBSCRIBE_PATH = '/newsletter/unsubscribe';
+
     /** @var Container */
     private $container;
     
@@ -27,13 +30,11 @@ class NewsletterPlugin extends Plugin
             return;
         }
 
-        $this->container = new Container();
-        $this->container['config'] = function() {
-            return $this->config;
-        };
+        $this->setContainer();
 
         $this->enable([
-            'onFormProcessed' => ['onFormProcessed', 0]
+            'onFormProcessed' => ['onFormProcessed', 0],
+            'onPageInitialized' => ['onPageInitialized']
         ]);
     }
 
@@ -45,7 +46,27 @@ class NewsletterPlugin extends Plugin
 
         switch ($action) {
             case 'subscribe':
-                $this->container->getFormProcessor()->process($form, $params);
+                $handlers = $this->container->getFormProcessor()->getHandlers($form, $params);
+                $this->container->getFormProcessor()->processSubscribe($handlers);
         }
+    }
+
+    public function onPageInitialized(Event $event)
+    {
+        if ($this->grav['uri']->path() === self::UNSUBSCRIBE_PATH) {
+            $controller = new NewsletterController($this->container);
+            $controller->execute('unsubscribe');
+        }
+    }
+
+    private function setContainer(): void
+    {
+        $this->container = new Container();
+        $this->container['grav'] = function () {
+            return $this->grav;
+        };
+        $this->container['config'] = function () {
+            return $this->config;
+        };
     }
 }

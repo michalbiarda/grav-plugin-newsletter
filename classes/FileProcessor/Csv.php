@@ -26,6 +26,20 @@ class Csv implements FileProcessorInterface
         }
     }
 
+    public function cut(string $filePath, string $hash): bool
+    {
+        if (empty($hash) || !$this->fileExists($filePath)) {
+            return false;
+        }
+        $reader = $this->getFileReader($filePath);
+        $index = $this->getIndexOfLineFilteredByIdentifier($reader, ['hash' => $hash], 'hash');
+        if (is_null($index)) {
+            return false;
+        }
+        $this->cutLineFromExistingFile($filePath, $reader, $index);
+        return true;
+    }
+
     private function createFolderIfDoesntExist(string $filePath): void
     {
         Folder::mkdir(dirname($filePath));
@@ -69,7 +83,7 @@ class Csv implements FileProcessorInterface
         return (new Statement())->offset($index)->process($reader)->jsonSerialize();
     }
 
-    private function updateLineOfValuesInExistentFile(string $filePath, Reader $reader, array $values, $index): void
+    private function updateLineOfValuesInExistentFile(string $filePath, Reader $reader, array $values, int $index): void
     {
         $beforeRecords = $this->getRecordsBeforeIndex($reader, $index);
         $afterRecords = $this->getRecordsAfterIndex($reader, $index);
@@ -84,5 +98,16 @@ class Csv implements FileProcessorInterface
     {
         $writer = Writer::createFromPath($filePath, 'a+');
         $writer->insertOne($values);
+    }
+
+    private function cutLineFromExistingFile(string $filePath, Reader $reader, int $index): void
+    {
+        $header = $reader->getHeader();
+        $beforeRecords = $this->getRecordsBeforeIndex($reader, $index);
+        $afterRecords = $this->getRecordsAfterIndex($reader, $index);
+        $writer = Writer::createFromPath($filePath, 'w');
+        $writer->insertOne($header);
+        $writer->insertAll($beforeRecords);
+        $writer->insertAll($afterRecords);
     }
 }

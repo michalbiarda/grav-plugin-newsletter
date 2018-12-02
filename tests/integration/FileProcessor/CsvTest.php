@@ -119,6 +119,57 @@ EOD;
         $this->assertSame($expected, $result);
     }
 
+    public function testCutWillReturnFalseIfEmptyHash()
+    {
+        $result = $this->csvProcessor->cut($this->filePath, '');
+        $this->assertFalse($result);
+    }
+
+    public function testCutWillReturnFalseIfFileDoesntExist()
+    {
+        $result = $this->csvProcessor->cut($this->filePath, 's0m3h45h');
+        $this->assertFalse($result);
+    }
+
+    public function testCutWillReturnFalseIfLineNotFound()
+    {
+        $content = <<<EOD
+foo,hash
+bar,n0tf0und
+
+EOD;
+        $this->createTmpFile($content);
+        $return = $this->csvProcessor->cut($this->filePath, 's0m3h45h');
+
+        $result = $this->getTmpFileContentAndUnlinkFile();
+        $expected = $content;
+        $this->assertFalse($return);
+        $this->assertSame($expected, $result);
+    }
+
+    public function testCutWillCutLineAndReturnTrueIfLineExists()
+    {
+        $content = <<<EOD
+foo,hash
+bar,n0tf0und
+baz,s0m3h45h
+bam,h3ll0123
+
+EOD;
+        $this->createTmpFile($content);
+        $return = $this->csvProcessor->cut($this->filePath, 's0m3h45h');
+
+        $result = $this->getTmpFileContentAndUnlinkFile();
+        $expected = <<<EOD
+foo,hash
+bar,n0tf0und
+bam,h3ll0123
+
+EOD;
+        $this->assertTrue($return);
+        $this->assertSame($expected, $result);
+    }
+
     /**
      * @return string
      */
