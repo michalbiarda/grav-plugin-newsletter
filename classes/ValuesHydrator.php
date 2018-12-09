@@ -11,8 +11,13 @@ class ValuesHydrator
         $values = [];
         $formValues = $form->getValues()->toArray()['data'];
         foreach ($fields as $field) {
-            $values[$field] = key_exists($field, $formValues) ? $formValues[$field] : '';
+            $values[$field] = $this->hydrateValue($field, $formValues, $form->fields());
         }
         return $values;
+    }
+
+    protected function hydrateValue(string $field, array $formValues, array $formFields): string
+    {
+        return key_exists($field, $formValues) ? $formValues[$field] : '';
     }
 }

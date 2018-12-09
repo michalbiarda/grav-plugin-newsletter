@@ -12,47 +12,43 @@ use PHPUnit\Framework\TestCase;
 class ValuesHydratorTest extends TestCase
 {
     /** @var ValuesHydrator */
-    private $valuesHydrator;
+    protected $valuesHydrator;
 
     /** @var Container */
-    private $container;
+    protected $container;
 
     /** @var MockObject|Form */
-    private $formMock;
+    protected $formMock;
 
     /** @var MockObject|Data */
-    private $dataMock;
+    protected $dataMock;
 
     public function setUp()
     {
         $this->dataMock = $this->getMockBuilder(Data::class)->setMethods(['toArray'])
             ->disableOriginalConstructor()->getMock();
-        $this->formMock = $this->getMockBuilder(Form::class)->setMethods(['getValues'])
-            ->disableOriginalConstructor()->getMock();
-        $this->formMock->expects($this->once())->method('getValues')->willReturn($this->dataMock);
-
-        $this->container = new Container();
+        $this->container = $this->getContainer();
         $this->valuesHydrator = $this->container->getValuesHydrator();
     }
 
     public function testGetValuesReturnsEmptyArrayIfFieldsAreEmpty()
     {
         $this->dataMock->expects($this->once())->method('toArray')->willReturn(['data' => ['foo' => 'bar']]);
-        $result = $this->valuesHydrator->getValues($this->formMock, []);
+        $result = $this->valuesHydrator->getValues($this->getFormMock(), []);
         $this->assertSame([], $result);
     }
 
     public function testGetValuesPutsEmptyValueIfFieldIsNotPresentInForm()
     {
         $this->dataMock->expects($this->once())->method('toArray')->willReturn(['data' => []]);
-        $result = $this->valuesHydrator->getValues($this->formMock, ['foo']);
+        $result = $this->valuesHydrator->getValues($this->getFormMock(), ['foo']);
         $this->assertSame(['foo' => ''], $result);
     }
 
     public function testGetValuesReturnsValuesFromFormIfFieldsMatches()
     {
         $this->dataMock->expects($this->once())->method('toArray')->willReturn(['data' => ['foo' => 'bar']]);
-        $result = $this->valuesHydrator->getValues($this->formMock, ['foo']);
+        $result = $this->valuesHydrator->getValues($this->getFormMock(), ['foo']);
         $this->assertSame(['foo' => 'bar'], $result);
     }
 
@@ -60,7 +56,24 @@ class ValuesHydratorTest extends TestCase
     {
         $this->dataMock->expects($this->once())->method('toArray')
             ->willReturn(['data' => ['foo' => 'bar', 'boo' => 'far']]);
-        $result = $this->valuesHydrator->getValues($this->formMock, ['foo']);
+        $result = $this->valuesHydrator->getValues($this->getFormMock(), ['foo']);
         $this->assertSame(['foo' => 'bar'], $result);
+    }
+
+    protected function getContainer(): Container
+    {
+        return new Container();
+    }
+
+    /**
+     * @return Form|MockObject
+     */
+    protected function getFormMock(array $fields = []): MockObject
+    {
+        $formMock = $this->getMockBuilder(Form::class)->setMethods(['getValues', 'fields'])
+            ->disableOriginalConstructor()->getMock();
+        $formMock->expects($this->any())->method('fields')->willReturn($fields);
+        $formMock->expects($this->once())->method('getValues')->willReturn($this->dataMock);
+        return $formMock;
     }
 }
